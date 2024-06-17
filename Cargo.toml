@@ -60,7 +60,7 @@ ahash = "0.8.0"
 chrono = { version = "0.4.15", features = ["std"], default-features = false, optional = true }
 rand = "0.9"
 serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["preserve_order"] }
+serde_json = { version = "1.0" }
 indexmap = "2.1.0"
 hex = "0.4.2"
 base64 = "0.22.1"
