@@ -373,9 +373,17 @@ impl<'de> Visitor<'de> for BsonVisitor {
                 }
 
                 "$binary" => {
-                    let v = visitor.next_value::<extjson::models::StdBinaryBody>()?;
+                    let v = visitor.next_value::<extjson::models::ExtBinaryBody>()?;
+                    let sub = match v {
+                        extjson::models::ExtBinaryBody::Canonical(_) => None,
+                        extjson::models::ExtBinaryBody::Legacy(_) => {
+                            let (kk, vv) = visitor.next_entry::<String, String>()?.unwrap();
+                            assert_eq!(kk, "$type");
+                            Some(vv)
+                        }
+                    };
                     return Ok(Bson::Binary(
-                        extjson::models::Binary { body: v }
+                        extjson::models::Binary { body: v, sub }
                             .parse()
                             .map_err(Error::custom)?,
                     ));

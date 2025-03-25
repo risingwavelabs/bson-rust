@@ -142,7 +142,18 @@ impl Regex {
 #[serde(deny_unknown_fields)]
 pub(crate) struct Binary {
     #[serde(rename = "$binary")]
-    pub(crate) body: StdBinaryBody,
+    pub(crate) body: ExtBinaryBody,
+
+    #[serde(rename = "$type")]
+    pub(crate) sub: Option<String>,
+}
+
+
+#[derive(Deserialize, Serialize)]
+#[serde(untagged)]
+pub(crate) enum ExtBinaryBody {
+    Canonical(StdBinaryBody),
+    Legacy(String),
 }
 
 #[derive(Deserialize, Serialize)]
@@ -155,17 +166,30 @@ pub(crate) struct StdBinaryBody {
 }
 
 impl Binary {
+    fn base64(&self) -> &str {
+        match &self.body {
+            ExtBinaryBody::Canonical(body) => &body.base64,
+            ExtBinaryBody::Legacy(body) => &body,
+        }
+    }
+    fn subtype(&self) -> &str {
+        match &self.body {
+            ExtBinaryBody::Canonical(body) => &body.subtype,
+            ExtBinaryBody::Legacy(_) => self.sub.as_ref().unwrap(),
+        }
+    }
+
     pub(crate) fn parse(self) -> extjson::de::Result<crate::Binary> {
-        let bytes = base64::decode(self.body.base64.as_str()).map_err(|_| {
+        let bytes = base64::decode(self.base64()).map_err(|_| {
             extjson::de::Error::invalid_value(
-                Unexpected::Str(self.body.base64.as_str()),
+                Unexpected::Str(self.base64()),
                 &"base64 encoded bytes",
             )
         })?;
 
-        let subtype = hex::decode(self.body.subtype.as_str()).map_err(|_| {
+        let subtype = hex::decode(self.subtype()).map_err(|_| {
             extjson::de::Error::invalid_value(
-                Unexpected::Str(self.body.subtype.as_str()),
+                Unexpected::Str(self.subtype()),
                 &"hexadecimal number as a string",
             )
         })?;
