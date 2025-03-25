@@ -142,12 +142,12 @@ impl Regex {
 #[serde(deny_unknown_fields)]
 pub(crate) struct Binary {
     #[serde(rename = "$binary")]
-    pub(crate) body: BinaryBody,
+    pub(crate) body: StdBinaryBody,
 }
 
 #[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct BinaryBody {
+pub(crate) struct StdBinaryBody {
     pub(crate) base64: String,
 
     #[serde(rename = "subType")]

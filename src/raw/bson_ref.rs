@@ -517,7 +517,7 @@ impl Serialize for RawBinaryRef<'_> {
             state.end()
         } else {
             let mut state = serializer.serialize_struct("$binary", 1)?;
-            let body = extjson::models::BinaryBody {
+            let body = extjson::models::StdBinaryBody {
                 base64: base64::encode(self.bytes),
                 subtype: hex::encode([self.subtype.into()]),
             };

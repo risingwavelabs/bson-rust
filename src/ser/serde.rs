@@ -685,7 +685,7 @@ impl Serialize for Binary {
             serializer.serialize_bytes(self.bytes.as_slice())
         } else {
             let mut state = serializer.serialize_struct("$binary", 1)?;
-            let body = extjson::models::BinaryBody {
+            let body = extjson::models::StdBinaryBody {
                 base64: base64::encode(self.bytes.as_slice()),
                 subtype: hex::encode([self.subtype.into()]),
             };

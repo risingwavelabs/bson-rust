@@ -373,7 +373,7 @@ impl<'de> Visitor<'de> for BsonVisitor {
                 }
 
                 "$binary" => {
-                    let v = visitor.next_value::<extjson::models::BinaryBody>()?;
+                    let v = visitor.next_value::<extjson::models::StdBinaryBody>()?;
                     return Ok(Bson::Binary(
                         extjson::models::Binary { body: v }
                             .parse()
